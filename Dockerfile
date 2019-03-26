@@ -29,7 +29,7 @@ USER postgres
 
 RUN /etc/init.d/postgresql start &&\
     psql --echo-all --command "CREATE USER rolepade WITH SUPERUSER PASSWORD 'escapade';" &&\
-    createdb -O rolepade escapade &&\
+    createdb -O rolepade escabase &&\
     /etc/init.d/postgresql stop
 
 

@@ -2,8 +2,7 @@ module escapade
 
 go 1.11
 
-// +heroku goVersion go1.12
-
 require (
-
+	github.com/gorilla/mux v1.7.0
+	github.com/lib/pq v1.0.0
 )
