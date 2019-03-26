@@ -1,7 +1,7 @@
 {
 	"server": {
 		"host": "http://localhost",
-		"port": ":3002"
+		"port": ":5000"
 	},
 	"dataBase": {
 		"driverName": "postgres",
@@ -14,25 +14,5 @@
 		],
 		"PageGames": 2,
 		"PageUsers": 10
-	},
-	"cors": {
-		"origins": [
-			"https://escapade-frontend.herokuapp.com"
-		],
-		"headers": [
-			"Content-type"
-		],
-		"credentials": "true",
-		"methods": [
-			"GET",
-			"POST",
-			"PUT",
-			"DELETE",
-			"OPTIONS"
-		]
-	},
-	"storage": {
-		"playersAvatarsStorage": "imgs/players/",
-		"fileMode":666
 	}
 }
