@@ -1,10 +1,10 @@
 package api
 
 import (
-	data "escapade/internal/database"
-	database "escapade/internal/database"
-	"escapade/internal/models"
-	re "escapade/internal/return_errors"
+	data "forum_bd/internal/database"
+	database "forum_bd/internal/database"
+	"forum_bd/internal/models"
+	re "forum_bd/internal/return_errors"
 	"net/http"
 )
 

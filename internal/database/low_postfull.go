@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"escapade/internal/models"
+	"forum_bd/internal/models"
 	"fmt"
 	"strings"
 

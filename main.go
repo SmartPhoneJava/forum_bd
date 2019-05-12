@@ -1,7 +1,7 @@
 package main
 
 import (
-	"escapade/internal/services/api"
+	"forum_bd/internal/services/api"
 	"fmt"
 	"os"
 

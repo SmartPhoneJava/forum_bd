@@ -1,8 +1,8 @@
 package api
 
 import (
-	"escapade/internal/config"
-	"escapade/internal/database"
+	"forum_bd/internal/config"
+	"forum_bd/internal/database"
 	//"reflect"
 )
 

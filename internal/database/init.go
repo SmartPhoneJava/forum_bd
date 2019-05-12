@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"escapade/internal/config"
+	"forum_bd/internal/config"
 	"fmt"
 	"os"
 
@@ -17,7 +17,7 @@ func Init(CDB config.DatabaseConfig) (db *DataBase, err error) {
 
 	// for local launch
 	if os.Getenv(CDB.URL) == "" {
-		os.Setenv(CDB.URL, "user=rolepade password=escapade dbname=escabase sslmode=disable")
+		os.Setenv(CDB.URL, "user=rolepade password=forum_bd dbname=escabase sslmode=disable")
 	}
 
 	var database *sql.DB
