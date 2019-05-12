@@ -2,7 +2,7 @@ package api
 
 import (
 	"encoding/json"
-	"escapade/internal/models"
+	"forum_bd/internal/models"
 	"fmt"
 	"net/http"
 )

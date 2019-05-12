@@ -2,8 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"escapade/internal/models"
-	re "escapade/internal/return_errors"
+	"forum_bd/internal/models"
+	re "forum_bd/internal/return_errors"
 	"strconv"
 
 	//

@@ -1,8 +1,8 @@
 package api
 
 import (
-	"escapade/internal/models"
-	re "escapade/internal/return_errors"
+	"forum_bd/internal/models"
+	re "forum_bd/internal/return_errors"
 	"net/http"
 	"time"
 )

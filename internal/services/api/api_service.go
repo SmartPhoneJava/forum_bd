@@ -1,7 +1,7 @@
 package api
 
 import (
-	"escapade/internal/models"
+	"forum_bd/internal/models"
 	"net/http"
 )
 
