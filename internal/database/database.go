@@ -63,3 +63,7 @@ func (qgc *QueryGetConditions) InitThread(tv time.Time,
 	qgc.ln = ln
 	qgc.desc = desc
 }
+
+func debug(text ...interface{}) {
+	//fmt.Println(text...)
+}

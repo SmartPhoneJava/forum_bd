@@ -1,7 +1,6 @@
 package models
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -20,11 +19,13 @@ type Post struct {
 
 // Print for debug
 func (post *Post) Print() {
-	fmt.Println("-------Post-------")
-	fmt.Println("--ID:", post.ID)
-	fmt.Println("--Parent:", post.Parent)
-	fmt.Println("--Path:", post.Path)
-	fmt.Println("--Created:", post.Created)
-	fmt.Println("--IsEdited:", post.IsEdited)
-	fmt.Println("--Thread:", post.Thread)
+	/*
+		fmt.Println("-------Post-------")
+		fmt.Println("--ID:", post.ID)
+		fmt.Println("--Parent:", post.Parent)
+		fmt.Println("--Path:", post.Path)
+		fmt.Println("--Created:", post.Created)
+		fmt.Println("--IsEdited:", post.IsEdited)
+		fmt.Println("--Thread:", post.Thread)
+	*/
 }

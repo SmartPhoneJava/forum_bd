@@ -2,9 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"time"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
 	//
 	_ "github.com/lib/pq"
@@ -30,48 +30,57 @@ func (db *DataBase) UpdatePost(post models.Post, id int) (updatedPost models.Pos
 }
 
 // CreatePost handle post creation
-func (db *DataBase) CreatePost(posts []models.Post, slug string) (createdPosts []models.Post, err error) {
+func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time) (err error) {
 
 	var (
 		tx         *sql.Tx
 		thatThread models.Thread
 		count      int
-		t          time.Time
 	)
 	if tx, err = db.Db.Begin(); err != nil {
 		return
 	}
 	defer tx.Rollback()
 
-	createdPosts = []models.Post{}
-
 	if thatThread, err = db.threadFindByIDorSlug(tx, slug); err != nil {
 
 		return
 	}
 
-	t = time.Now()
-	count = 0
-	for _, post := range posts {
+	// size := len(posts)
+	// users := make([]string, size)
 
-		if post.Author, err = db.userCheckID(tx, post.Author); err != nil {
-			return
-		}
+	/*
+		for _, post := range posts {
 
-		if post.Parent != 0 {
-			if err = db.postCheckParent(tx, post, thatThread); err != nil {
-				err = re.ErrorPostConflict()
+			// if _, err = db.userCheckID(tx, post.Author); err != nil {
+			// 	return
+			// }
+			fmt.Println("post.Author:", post.Author)
+
+			if post, err = db.postCreate(tx, post, thatThread, t); err != nil {
 				return
 			}
-		}
 
-		if post, err = db.postCreate(tx, post, thatThread, t); err != nil {
-			return
-		}
+			// if post.Parent != 0 {
+			// 	if err = db.postCheckParent(tx, post, thatThread); err != nil {
+			// 		fmt.Println("re.ErrorPostConflict()", thatThread.ID, post.Thread, post.Thread, post.ID)
+			// 		//err = re.ErrorPostConflict()
+			// 		return
+			// 	}
+			// }
 
-		createdPosts = append(createdPosts, post)
-		count++
+			createdPosts = append(createdPosts, post)
+			count++
+		}
+	*/
+	//errchan := make(chan error)
+	count = len(posts)
+	if err = db.postsCreate(tx, posts, thatThread, t); err != nil {
+		return
 	}
+	debug("posts created")
+
 	if err = db.forumUpdatePosts(tx, thatThread.Forum, count); err != nil {
 		return
 	}
@@ -81,6 +90,34 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string) (createdPosts [
 	}
 
 	err = tx.Commit()
+	/*
+			errchan := make(chan error)
+		//fmt.Println("ready to put")
+		errchan <- err
+		//fmt.Println("we put")
+		defer close(errchan)
+
+		count := len(posts)
+		//fmt.Println("init")
+		all := &sync.WaitGroup{}
+		all.Add(3)
+		go db.postsCreate(tx1, posts, thatThread, t, all, errchan)
+		go db.forumUpdatePosts(tx2, thatThread.Forum, count, all, errchan)
+		go db.statusAddPost(tx3, count, all, errchan)
+
+		//fmt.Println("wait start:")
+		all.Wait()
+		//fmt.Println("wait over:")
+		var ok bool
+		if err, ok = <-errchan; ok && (err != nil) {
+			//fmt.Println("err:", err.Error())
+			return
+		}
+
+		err = tx1.Commit()
+		err = tx2.Commit()
+		err = tx3.Commit()
+	*/
 	return
 }
 

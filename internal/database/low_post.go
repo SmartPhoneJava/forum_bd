@@ -2,10 +2,11 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"fmt"
 	"strconv"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	//re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	"time"
 	//
@@ -39,34 +40,117 @@ func updatePath(path *string, id int) {
 func (db *DataBase) postCreate(tx *sql.Tx, post models.Post, thread models.Thread,
 	t time.Time) (createdPost models.Post, err error) {
 
-	var (
-		path string
-	)
-	if post.Parent == 0 {
-		path = "0"
-	} else {
-		if path, err = getPath(tx, post.Parent); err != nil {
-			return
-		}
-		if path == "" {
-			err = re.ErrorInvalidPath()
-		}
-	}
+	// var (
+	// 	path string
+	// )
+	// if post.Parent == 0 {
+	// 	path = "0"
+	// } else {
+	// 	if path, err = getPath(tx, post.Parent); err != nil {
+	// 		return
+	// 	}
+	// 	if path == "" {
+	// 		err = re.ErrorInvalidPath()
+	// 	}
+	// }
 
-	query := `INSERT INTO Post(author, created, forum, message, thread, parent, path) VALUES
-						 	($1, $2, $3, $4, $5, $6, $7) 
+	query := `INSERT INTO Post(author, created, forum, message, thread, parent) VALUES
+						 	($1, $2, $3, $4, $5, $6) 
 						 `
 	queryAddPostReturning(&query)
 	row := tx.QueryRow(query, post.Author, t,
-		thread.Forum, post.Message, thread.ID, post.Parent, path)
+		thread.Forum, post.Message, thread.ID, post.Parent)
 
 	if createdPost, err = postScan(row); err != nil {
 		return
 	}
 
-	query = `UPDATE Post set path=$1 where id=$2 `
-	updatePath(&path, createdPost.ID)
-	_, err = tx.Exec(query, path, createdPost.ID)
+	// query = `UPDATE Post set path=$1 where id=$2 `
+	// updatePath(&path, createdPost.ID)
+	// _, err = tx.Exec(query, path, createdPost.ID)
+
+	return
+}
+
+func intToString(n int) string {
+	buf := [11]byte{}
+	pos := len(buf)
+	i := int64(n)
+	signed := i < 0
+	if signed {
+		i = -i
+	}
+	for {
+		pos--
+		buf[pos], i = '0'+byte(i%10), i/10
+		if i == 0 {
+			if signed {
+				pos--
+				buf[pos] = '-'
+			}
+			return string(buf[pos:])
+		}
+	}
+}
+
+func addPostToQuery(post models.Post) string {
+	return "('" +
+		post.Author + "',$1,$2,'" +
+		post.Message + "', $3,'" +
+		intToString(post.Parent) + "')"
+}
+
+// postCreate create post
+func (db *DataBase) postsCreate(tx *sql.Tx, posts []models.Post, thread models.Thread,
+	t time.Time) (err error) {
+	if len(posts) == 0 {
+		return nil
+	}
+	where := "Post100"
+	if thread.ID < 50 {
+		where = "Post50"
+	}
+	query := `
+		INSERT INTO ` + where + `(author, created, forum, message, thread, parent) VALUES
+						
+						 `
+
+	for i, post := range posts {
+		if i == 0 {
+			query += addPostToQuery(post)
+		} else {
+			query += "," + addPostToQuery(post)
+		}
+		posts[i].Thread = thread.ID
+		posts[i].Forum = thread.Forum
+		posts[i].Created = t
+	}
+	query += " returning id"
+	//queryAddPostReturning(&query)
+	debug("query createPosts:", query)
+	debug("query pars:", thread.Forum, thread.ID)
+	var rows *sql.Rows
+
+	if rows, err = tx.Query(query, t, thread.Forum, thread.ID); err != nil {
+		debug("error is here", err.Error())
+		return
+	}
+	defer rows.Close()
+	debug("try")
+
+	//createdPosts = []models.Post{}
+	i := 0
+	for rows.Next() {
+		if err = rows.Scan(&posts[i].ID); err != nil {
+			break
+		}
+		i++
+	}
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	debug("done")
 
 	return
 }
@@ -214,7 +298,7 @@ func (db *DataBase) postsGet(tx *sql.Tx, thread models.Thread,
 	`
 	queryAddConditions(&query, qc, pq)
 
-	fmt.Println("query:" + query)
+	debug("query:" + query)
 	var rows *sql.Rows
 
 	if rows, err = tx.Query(query, thread.ID, thread.Forum); err != nil {
@@ -283,10 +367,7 @@ func (db *DataBase) postCheckParent(tx *sql.Tx, post models.Post, thread models.
 	query := `
 	select 1
 		from Post as P
-		where id!=$1 and $2  =
-			(
-				select thread from Post where id=$1
-			)	
+		where id = $1 and thread = $2
 	`
 
 	var tmp int

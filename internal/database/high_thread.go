@@ -2,9 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"time"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"
@@ -20,6 +21,7 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	defer tx.Rollback()
 
 	if returnThread, err = db.threadConfirmUnique(tx, thread); err != nil {
+		err = re.ErrorThreadConflict()
 		return
 	}
 
@@ -27,21 +29,22 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	// 	return
 	// }
 
-	if thread.Forum, err = db.forumCheckID(tx, thread.Forum); err != nil {
-		return
-	}
-
+	// debug("forumCheckID:", thread.Forum)
+	// if thread.Forum, err = db.forumCheckID(tx, thread.Forum); err != nil {
+	// 	return
+	// }
+	debug("forumCheckID1:", thread.Forum)
 	if returnThread, err = db.threadCreate(tx, thread); err != nil {
 		return
 	}
 
-	if err = db.forumUpdateThreads(tx, thread.Forum); err != nil {
-		return
-	}
+	// if err = db.forumUpdateThreads(tx, thread.Forum); err != nil {
+	// 	return
+	// }
 
-	if err = db.statusAddThread(tx, 1); err != nil {
-		return
-	}
+	// if err = db.statusAddThread(tx, 1); err != nil {
+	// 	return
+	// }
 
 	err = tx.Commit()
 	return

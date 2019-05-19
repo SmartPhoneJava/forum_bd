@@ -1,10 +1,11 @@
 package api
 
 import (
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"net/http"
 	"time"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 )
 
 // CreateThread create thread
@@ -81,7 +82,6 @@ func (h *Handler) UpdateThread(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, thread, place)
 	printResult(err, http.StatusOK, place)
 	return
@@ -164,7 +164,6 @@ func (h *Handler) GetThreads(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, threads, place)
 	printResult(err, http.StatusOK, place)
 	return

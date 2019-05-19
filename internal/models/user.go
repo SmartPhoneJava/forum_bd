@@ -1,9 +1,5 @@
 package models
 
-import (
-	"fmt"
-)
-
 // User model
 type User struct {
 	ID       int    `json:"-" db:"id"`
@@ -15,9 +11,11 @@ type User struct {
 
 // Print for debug
 func (user *User) Print() {
-	fmt.Println("-------User-------")
-	fmt.Println("--About:", user.About)
-	fmt.Println("--Email:", user.Email)
-	fmt.Println("--Fullname:", user.Fullname)
-	fmt.Println("--Nickname:", user.Nickname)
+	/*
+		fmt.Println("-------User-------")
+		fmt.Println("--About:", user.About)
+		fmt.Println("--Email:", user.Email)
+		fmt.Println("--Fullname:", user.Fullname)
+		fmt.Println("--Nickname:", user.Nickname)
+	*/
 }

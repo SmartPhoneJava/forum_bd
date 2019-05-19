@@ -2,8 +2,8 @@ package api
 
 import (
 	"encoding/json"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 	"net/http"
 	"strconv"
 	"time"

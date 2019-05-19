@@ -1,7 +1,7 @@
 package main
 
 import (
-	"forum_bd/internal/services/api"
+	"github.com/SmartPhoneJava/forum_bd/internal/services/api"
 	"fmt"
 	"os"
 

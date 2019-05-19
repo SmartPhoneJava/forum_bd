@@ -1,8 +1,9 @@
 package api
 
 import (
-	"forum_bd/internal/models"
 	"net/http"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 )
 
 // GetStatus get status
@@ -22,7 +23,6 @@ func (h *Handler) GetStatus(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, status, place)
 	printResult(err, http.StatusOK, place)
 	return

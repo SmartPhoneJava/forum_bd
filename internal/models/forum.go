@@ -1,7 +1,5 @@
 package models
 
-import "fmt"
-
 // Forum model
 type Forum struct {
 	Posts   int    `json:"posts" db:"posts"`
@@ -13,12 +11,14 @@ type Forum struct {
 
 // Print for debug
 func (forum *Forum) Print() {
-	fmt.Println("-------Forum-------")
-	fmt.Println("--Posts:", forum.Posts)
-	fmt.Println("--Threads:", forum.Threads)
-	fmt.Println("--Slug:", forum.Slug)
-	fmt.Println("--Title:", forum.Title)
-	fmt.Println("--User:", forum.User)
+	/*
+		fmt.Println("-------Forum-------")
+		fmt.Println("--Posts:", forum.Posts)
+		fmt.Println("--Threads:", forum.Threads)
+		fmt.Println("--Slug:", forum.Slug)
+		fmt.Println("--Title:", forum.Title)
+		fmt.Println("--User:", forum.User)
+	*/
 }
 
 /*

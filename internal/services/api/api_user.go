@@ -1,11 +1,12 @@
 package api
 
 import (
-	data "forum_bd/internal/database"
-	database "forum_bd/internal/database"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"net/http"
+
+	data "github.com/SmartPhoneJava/forum_bd/internal/database"
+	database "github.com/SmartPhoneJava/forum_bd/internal/database"
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 )
 
 // Handler is struct
@@ -138,7 +139,6 @@ func (h *Handler) GetProfile(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	sendSuccessJSON(rw, user, place)
-	rw.WriteHeader(http.StatusOK)
 	printResult(err, http.StatusOK, place)
 	return
 }
@@ -182,7 +182,6 @@ func (h *Handler) UpdateProfile(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, user, place)
 	printResult(err, http.StatusOK, place)
 	return

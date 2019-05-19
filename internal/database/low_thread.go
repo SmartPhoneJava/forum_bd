@@ -2,11 +2,11 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
-	"fmt"
 	"strconv"
 	"time"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"
@@ -14,15 +14,55 @@ import (
 
 // createThread create thread
 func (db *DataBase) threadCreate(tx *sql.Tx, thread *models.Thread) (createdThread models.Thread, err error) {
-
 	query := `INSERT INTO Thread(slug, author, created, forum, message, title) VALUES
-						 	($1, $2, $3, $4, $5, $6) 
-						 `
+	($1, $2, $3, $4, $5, $6) 
+`
 	queryAddThreadReturning(&query)
 	row := tx.QueryRow(query, thread.Slug, thread.Author, thread.Created,
 		thread.Forum, thread.Message, thread.Title)
 
+	debug("query", query)
+	debug("pars", thread.Slug, thread.Author, thread.Created,
+		thread.Forum, thread.Message, thread.Title)
 	createdThread, err = threadScan(row)
+	/*
+		var id string
+		queryID := `select nextval('thread_id_seq');`
+		row := tx.QueryRow(queryID)
+		if err = row.Scan(&id); err != nil {
+			return
+		}
+
+		query := `INSERT INTO Thread(id, slug, author, created, forum, message, title) VALUES
+							 	($1, $2, $3, $4, $5, $6, $7)
+							 `
+		//queryAddThreadReturning(&query)
+		_, err = tx.Exec(query, id, thread.Slug, thread.Author, thread.Created,
+			thread.Forum, thread.Message, thread.Title)
+
+		debug("query", "INSERT INTO Thread(id, slug, author, forum, message, title) VALUES ("+
+			id+",'"+thread.Slug+"', '"+thread.Author+"', '", thread.Forum, "','"+
+			thread.Message+"', '"+thread.Title+"') ")
+		debug("pars", thread.Slug, thread.Author, thread.Created,
+			thread.Forum, thread.Message, thread.Title)
+		debug("thread id:", id)
+
+		if err != nil {
+			debug("cant create cause:", err.Error())
+			return
+		}
+
+		queryGet := `select id, slug, author, created, forum, message, title, votes from Thread where id = ` + id
+		row = tx.QueryRow(queryGet)
+		createdThread, err = threadScan(row)
+		// if err == sql.ErrNoRows {
+		// 	err = nil
+		// 	return
+		// }
+	*/
+	if err != nil {
+		debug("err create:", err.Error())
+	}
 	return
 }
 
@@ -36,7 +76,7 @@ func (db *DataBase) threadUpdate(tx *sql.Tx, thread *models.Thread, slug string)
 	}
 	queryAddSlug(&query, slug)
 	queryAddThreadReturning(&query)
-	fmt.Print("threadUpdate query:", query)
+	debug("threadUpdate query:", query)
 	row := tx.QueryRow(query)
 	updatedThread, err = threadScan(row)
 	return
@@ -173,6 +213,20 @@ func (db DataBase) threadFindByIDorSlug(tx *sql.Tx, arg string) (foundThread mod
 	queryAddSlug(&query, arg)
 	row := tx.QueryRow(query)
 	foundThread, err = threadScan(row)
+	return
+}
+
+func (db DataBase) threadIDBySlug(tx *sql.Tx, slug string) (id int, err error) {
+
+	query := ` SELECT id from Thread`
+	if id, err = strconv.Atoi(slug); err != nil {
+		query += ` where lower(slug) like lower($1)`
+		row := tx.QueryRow(query, slug)
+		err = row.Scan(&id)
+	} else {
+		return id, nil
+	}
+	debug("slug", slug)
 	return
 }
 

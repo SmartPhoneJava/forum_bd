@@ -2,9 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	"fmt"
 	"strings"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
 	//
 	_ "github.com/lib/pq"
@@ -39,7 +39,7 @@ func (db *DataBase) postfullGet(tx *sql.Tx, existRelated bool, related string, i
 		query = querySelectThread() + ` join Post as P on T.id=P.thread
 			 where P.id = $1
 		`
-		fmt.Println("query Thread:" + query)
+		debug("query Thread:" + query)
 		fullpost.Thread = &models.Thread{}
 
 		if *fullpost.Thread, err = threadScan(tx.QueryRow(query, id)); err != nil {

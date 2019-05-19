@@ -14,5 +14,5 @@ func ErrorInvalidID() error {
 
 // ErrorPostConflict post conflict
 func ErrorPostConflict() error {
-	return errors.New("Parent post was created in another thread")
+	return errors.New("pq: Parent post was created in another thread")
 }

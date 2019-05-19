@@ -2,21 +2,20 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
 	//
 	_ "github.com/lib/pq"
 )
 
 // voteCreate
-func (db *DataBase) voteCreate(tx *sql.Tx, vote models.Vote, thread models.Thread) (createdVote models.Vote, err error) {
+func (db *DataBase) voteCreate(tx *sql.Tx, vote models.Vote) (err error) {
 
 	query := `INSERT INTO Vote(author, voice, thread) VALUES
-						 	($1, $2, $3) 
+							 ($1, $2, $3)
 						 `
-	queryAddVoteReturning(&query)
-	row := tx.QueryRow(query, vote.Author, vote.Voice, thread.ID)
-	createdVote, err = voteScan(row)
+	_, err = tx.Exec(query, vote.Author, vote.Voice, vote.Thread)
 	return
 }
 
@@ -31,27 +30,30 @@ func (db DataBase) voteFindByThreadAndAuthor(tx *sql.Tx, thread int, author stri
 }
 
 // voteUpdate
-func (db DataBase) voteUpdate(tx *sql.Tx, vote models.Vote, thread models.Thread) (updatedVote models.Vote, err error) {
+func (db DataBase) voteUpdate(tx *sql.Tx, vote models.Vote, threadID int) (updatedVote models.Vote, prevVoice int, err error) {
 
-	query := `	UPDATE Vote set voice = $1                --, isEdited = true
-		where author = $2 and thread = $3 and isEdited = false
+	query := `	UPDATE Vote set old_voice = voice, voice = $1    --, isEdited = true
+		where author = $2 and thread = $3 --and isEdited = false
+		RETURNING author, voice, thread, isEdited, old_voice;
 	`
-	queryAddVoteReturning(&query)
 
-	row := tx.QueryRow(query, vote.Voice, vote.Author, thread.ID)
-	updatedVote, err = voteScan(row)
+	row := tx.QueryRow(query, vote.Voice, vote.Author, threadID)
+
+	updatedVote = models.Vote{}
+	err = row.Scan(&updatedVote.Author, &updatedVote.Voice,
+		&updatedVote.Thread, &updatedVote.IsEdited, &prevVoice)
 	return
 }
 
 // voteThread
-func (db *DataBase) voteThread(tx *sql.Tx, voice int, thread models.Thread) (updated models.Thread, err error) {
+func (db *DataBase) voteThread(tx *sql.Tx, voice int, threadID int) (updated models.Thread, err error) {
 
 	query := `	UPDATE Thread set votes = votes + $1
 								where id = $2
 						 `
 	queryAddThreadReturning(&query)
 
-	row := tx.QueryRow(query, voice, thread.ID)
+	row := tx.QueryRow(query, voice, threadID)
 
 	updated, err = threadScan(row)
 	return
