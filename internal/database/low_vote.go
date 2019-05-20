@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
@@ -10,12 +11,21 @@ import (
 )
 
 // voteCreate
-func (db *DataBase) voteCreate(tx *sql.Tx, vote models.Vote) (err error) {
+func (db *DataBase) voteCreate(tx *sql.Tx, vote models.Vote) (updatedVote models.Vote, prevVoice int, err error) {
 
 	query := `INSERT INTO Vote(author, voice, thread) VALUES
-							 ($1, $2, $3)
+							 ($1, $2, $3) on conflict(author, thread)  do
+							 update set voice = $2
+							 RETURNING author, voice, thread, isEdited, old_voice 
 						 `
-	_, err = tx.Exec(query, vote.Author, vote.Voice, vote.Thread)
+	row := tx.QueryRow(query, vote.Author, vote.Voice, vote.Thread)
+
+	updatedVote = models.Vote{}
+	err = row.Scan(&updatedVote.Author, &updatedVote.Voice,
+		&updatedVote.Thread, &updatedVote.IsEdited, &prevVoice)
+	if err != nil {
+		fmt.Println("and error:", err.Error())
+	}
 	return
 }
 

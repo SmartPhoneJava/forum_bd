@@ -12,29 +12,36 @@ import (
 func (h *Handler) CreateThread(rw http.ResponseWriter, r *http.Request) {
 	const place = "CreateThread"
 	var (
-		thread models.Thread
-		err    error
+		tthread models.Thread
+		thread  *models.Thread
+		err     error
 	)
 
 	rw.Header().Set("Content-Type", "application/json")
 
-	if thread, err = getThread(r); err != nil {
+	if tthread, err = getThread(r); err != nil {
 		rw.WriteHeader(http.StatusBadRequest)
 		sendErrorJSON(rw, err, place)
 		printResult(err, http.StatusBadRequest, place)
 		return
 	}
+	thread = &tthread
 
-	if thread, err = h.DB.CreateThread(&thread); err != nil {
-		if err.Error() == re.ErrorThreadConflict().Error() {
-			rw.WriteHeader(http.StatusConflict)
-			sendSuccessJSON(rw, thread, place)
-			printResult(err, http.StatusConflict, place)
-		} else {
-			rw.WriteHeader(http.StatusNotFound)
-			sendErrorJSON(rw, err, place)
-			printResult(err, http.StatusNotFound, place)
-		}
+	threadChan := make(chan *models.Thread, 1)
+	errChan := make(chan error, 1)
+	go h.DB.CreateThread(thread, threadChan, errChan)
+	err = <-errChan
+	thread = <-threadChan
+
+	if thread == nil {
+		rw.WriteHeader(http.StatusNotFound)
+		sendErrorJSON(rw, err, place)
+		printResult(err, http.StatusNotFound, place)
+		return
+	} else if err != nil && err.Error() == re.ErrorThreadConflict().Error() {
+		rw.WriteHeader(http.StatusConflict)
+		sendSuccessJSON(rw, thread, place)
+		printResult(err, http.StatusConflict, place)
 		return
 	}
 

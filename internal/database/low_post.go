@@ -117,6 +117,7 @@ func (db *DataBase) postsCreate(tx *sql.Tx, posts []models.Post, thread models.T
 	if len(posts) == 0 {
 		return nil
 	}
+
 	query := `
 		INSERT INTO Post(author, created, forum, message, thread, parent) VALUES
 						

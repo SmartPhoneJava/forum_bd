@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 	"time"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
@@ -12,16 +13,25 @@ import (
 )
 
 // CreateThread handle thread creation
-func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thread, err error) {
+func (db *DataBase) CreateThread(thread *models.Thread,
+	modelChan chan *models.Thread, errChan chan error) {
 
-	var tx *sql.Tx
+	var (
+		tx           *sql.Tx
+		err          error
+		returnThread models.Thread
+	)
 	if tx, err = db.Db.Begin(); err != nil {
+		errChan <- err
+		modelChan <- nil
 		return
 	}
 	defer tx.Rollback()
 
 	if returnThread, err = db.threadConfirmUnique(tx, thread); err != nil {
-		err = re.ErrorThreadConflict()
+		//err = re.ErrorThreadConflict()
+		errChan <- re.ErrorThreadConflict()
+		modelChan <- &returnThread
 		return
 	}
 
@@ -35,6 +45,8 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	// }
 	debug("forumCheckID1:", thread.Forum)
 	if returnThread, err = db.threadCreate(tx, thread); err != nil {
+		modelChan <- nil
+		errChan <- err
 		return
 	}
 
@@ -47,20 +59,18 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	// }
 
 	if err = tx.Commit(); err != nil {
+		fmt.Println("err:", err.Error())
+		modelChan <- nil
+		errChan <- err
 		return
 	}
-
-	var tx1 *sql.Tx
-	if tx1, err = db.Db.Begin(); err != nil {
-		return
-	}
-	defer tx1.Rollback()
+	modelChan <- &returnThread
+	errChan <- nil
 
 	if erro := db.userInForumCreate(thread.Author, thread.Forum); erro != nil {
 		debug("erro:", erro.Error())
 		return
 	}
-	tx1.Commit()
 
 	return
 }

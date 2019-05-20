@@ -204,6 +204,16 @@ func threadCreateTable() string {
     FOREIGN KEY (forum)
     REFERENCES Forum(slug)
         ON DELETE CASCADE;
+
+    CREATE INDEX thread_lower_author ON 
+        Thread using btree (lower(author));
+
+    ALTER INDEX thread_lower_author OWNER TO rolepade;
+
+    CREATE INDEX thread_lower_slug ON 
+        Thread using btree (lower(slug));
+
+    ALTER INDEX thread_lower_slug OWNER TO rolepade;
 /*
         CREATE Table Thread_forum_below_50 (
             CHECK(forum_id < 50)
@@ -447,8 +457,8 @@ func postCreateTable() string {
     --REFERENCES Thread(id)
     --    ON DELETE CASCADE;
 
-    CREATE INDEX post_thread ON 
-            Post using btree (thread);
+    CREATE INDEX post_id_thread ON 
+            Post using btree (id, thread);
 
     CREATE INDEX post_lower_author ON 
             Post using btree (lower(author));
@@ -539,11 +549,12 @@ func postCreateTable() string {
         check_parent int;
         parent_path text;
     BEGIN 
-        --select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
+        check_user := 0;
+        select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
         
-        --if check_user = null then
-        --    RAISE EXCEPTION 'error with check_user';
-        --END IF;
+        if check_user = 0 then
+            RAISE EXCEPTION 'error with check_user';
+        END IF;
 
         if NEW.parent <> 0 then
             select count(1) from Post as P where id = NEW.parent and thread = NEW.thread limit 1 into check_parent;
@@ -595,14 +606,14 @@ func voteCreateTable() string {
 
     ALTER Table Vote OWNER TO rolepade;
 
-    ALTER TABLE Vote
-    ADD CONSTRAINT vote_user
-    FOREIGN KEY (author)
-    REFERENCES UserForum(nickname)
-        ON DELETE CASCADE;
+    --ALTER TABLE Vote
+    --ADD CONSTRAINT vote_user
+    --FOREIGN KEY (author)
+    --REFERENCES UserForum(nickname)
+    --   ON DELETE CASCADE;
 
-    CREATE INDEX vote_thread ON 
-        Vote using btree (thread);
+    --CREATE INDEX vote_thread ON 
+    --    Vote using btree (thread);
 
     --ALTER TABLE Vote
     --ADD CONSTRAINT vote_thread
@@ -614,6 +625,32 @@ func voteCreateTable() string {
         Vote (thread, author);
 
     ALTER Index vote_thread_author OWNER TO rolepade;
+
+    CREATE OR REPLACE FUNCTION trigger_vote_function_before () 
+    RETURNS trigger AS $$ 
+    DECLARE
+    check_user int;
+    BEGIN 
+
+    check_user := 0;
+        select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
+        
+        if check_user = 0 then
+            RAISE EXCEPTION 'error with check_user';
+        END IF;
+
+    NEW.old_voice = OLD.voice; 
+    
+    return NEW;
+    END; 
+    $$ LANGUAGE  plpgsql;
+
+    ALTER FUNCTION trigger_vote_function_before() OWNER TO rolepade;
+    
+    --DROP TRIGGER IF EXISTS vote_trigger on Vote; 
+    CREATE TRIGGER vote_trigger_before
+    BEFORE UPDATE ON Vote FOR EACH ROW 
+    EXECUTE PROCEDURE trigger_vote_function_before ();
 
     CREATE OR REPLACE FUNCTION trigger_vote_function () 
         RETURNS trigger AS $$ 

@@ -34,7 +34,6 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, do
 
 	var (
 		tx         *sql.Tx
-		tx1        *sql.Tx
 		thatThread models.Thread
 		count      int
 		err        error
@@ -96,16 +95,9 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, do
 	err = tx.Commit()
 	done <- err // it is stop for outter functions
 
-	if tx1, err = db.Db.Begin(); err != nil {
-		//done <- err
-		return
-	}
-	defer tx1.Rollback()
-
 	db.userInForumCreatePosts(posts, thatThread)
 	//done <- nil
 
-	err = tx1.Commit()
 	/*
 			errchan := make(chan error)
 		//fmt.Println("ready to put")
