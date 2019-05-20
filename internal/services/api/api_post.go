@@ -36,7 +36,10 @@ func (h *Handler) CreatePosts(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err = h.DB.CreatePost(posts, slug, t); err != nil {
+	errChan := make(chan error, 1)
+	go h.DB.CreatePost(posts, slug, t, errChan)
+
+	if err = <-errChan; err != nil {
 		if err.Error() != re.ErrorPostConflict().Error() {
 			rw.WriteHeader(http.StatusNotFound)
 			sendErrorJSON(rw, err, place)

@@ -100,18 +100,25 @@ func addPostToQuery(post models.Post) string {
 		intToString(post.Parent) + "')"
 }
 
+func addPostAuthor(post models.Post) string {
+	return "(lower('" + post.Author + "'),lower($1)"
+}
+
+func (db *DataBase) userInForumCreatePosts(posts []models.Post, thread models.Thread) {
+	for _, post := range posts {
+		db.userInForumCreate(post.Author, thread.Forum)
+	}
+	return
+}
+
 // postCreate create post
 func (db *DataBase) postsCreate(tx *sql.Tx, posts []models.Post, thread models.Thread,
 	t time.Time) (err error) {
 	if len(posts) == 0 {
 		return nil
 	}
-	where := "Post100"
-	if thread.ID < 50 {
-		where = "Post50"
-	}
 	query := `
-		INSERT INTO ` + where + `(author, created, forum, message, thread, parent) VALUES
+		INSERT INTO Post(author, created, forum, message, thread, parent) VALUES
 						
 						 `
 
@@ -151,7 +158,6 @@ func (db *DataBase) postsCreate(tx *sql.Tx, posts []models.Post, thread models.T
 		fmt.Println(err.Error())
 	}
 	debug("done")
-
 	return
 }
 

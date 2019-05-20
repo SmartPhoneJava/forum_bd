@@ -46,7 +46,22 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	// 	return
 	// }
 
-	err = tx.Commit()
+	if err = tx.Commit(); err != nil {
+		return
+	}
+
+	var tx1 *sql.Tx
+	if tx1, err = db.Db.Begin(); err != nil {
+		return
+	}
+	defer tx1.Rollback()
+
+	if erro := db.userInForumCreate(thread.Author, thread.Forum); erro != nil {
+		debug("erro:", erro.Error())
+		return
+	}
+	tx1.Commit()
+
 	return
 }
 

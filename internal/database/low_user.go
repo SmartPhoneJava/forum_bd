@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -197,11 +196,11 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 	var rows *sql.Rows
 
 	if rows, err = tx.Query(query, slug); err != nil {
-		fmt.Println("get users err", err.Error())
+		debug("get users err", err.Error())
 		return
 	}
 	defer rows.Close()
-	fmt.Println("query get rows")
+	debug("query get rows")
 
 	foundUsers = []models.User{}
 	for rows.Next() {
@@ -209,7 +208,7 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 			break
 		}
 	}
-	fmt.Println("get users done")
+	debug("get users done")
 	return
 }
 

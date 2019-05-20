@@ -12,6 +12,21 @@ import (
 	_ "github.com/lib/pq"
 )
 
+func (db *DataBase) userInForumCreate(nickname, forum string) (err error) {
+
+	query := `
+		INSERT into UserInForum(nickname, forum) values (lower($1), lower($2))
+						 `
+
+	if _, err = db.Db.Exec(query, nickname, forum); err != nil {
+		debug("error createUserInForum is here", err.Error())
+		return
+	}
+
+	debug("done")
+	return
+}
+
 // createThread create thread
 func (db *DataBase) threadCreate(tx *sql.Tx, thread *models.Thread) (createdThread models.Thread, err error) {
 	query := `INSERT INTO Thread(slug, author, created, forum, message, title) VALUES

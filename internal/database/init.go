@@ -65,6 +65,8 @@ func (db *DataBase) createTables() error {
 func dropTables() string {
 	return `
     DROP TABLE IF EXISTS Vote CASCADE;
+    DROP TABLE IF EXISTS Post50 CASCADE;
+    DROP TABLE IF EXISTS Post100 CASCADE;
     DROP TABLE IF EXISTS Post CASCADE;
     DROP TABLE IF EXISTS Thread CASCADE;
     DROP TABLE IF EXISTS Thread_forum_below_50 CASCADE;
@@ -109,6 +111,7 @@ func userInForumCreateTable() string {
 
     ALTER TABLE UserInForum OWNER TO rolepade;
 
+    
     CREATE OR REPLACE FUNCTION trigger_userinforum_before_function () 
     RETURNS trigger AS $$ 
     DECLARE
@@ -128,7 +131,7 @@ func userInForumCreateTable() string {
     CREATE TRIGGER userinforum_before_trigger 
     BEFORE INSERT ON UserInForum FOR EACH ROW 
     EXECUTE PROCEDURE trigger_userinforum_before_function ();
-
+    
 
     CREATE INDEX user_in_forum ON 
         UserInForum (nickname, forum);
@@ -313,7 +316,7 @@ func threadCreateTable() string {
         BEGIN 
             UPDATE Forum set threads=threads+1 where slug=NEW.forum;
             UPDATE Status set thread = thread + 1;
-            INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
+            --INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
             return NEW;
         END; 
         $$ LANGUAGE  plpgsql;
@@ -429,11 +432,14 @@ func postCreateTable() string {
     REFERENCES UserForum(nickname)
         ON DELETE CASCADE;
 
-    ALTER TABLE Post
-    ADD CONSTRAINT post_forum
-    FOREIGN KEY (forum)
-    REFERENCES Forum(slug)
-        ON DELETE CASCADE;
+    --ALTER TABLE Post
+    --ADD CONSTRAINT post_forum
+    --FOREIGN KEY (forum)
+    --REFERENCES Forum(slug)
+    --    ON DELETE CASCADE;
+
+    CREATE INDEX post_forum ON 
+        Post using btree (forum);
     
     --ALTER TABLE Post
     --ADD CONSTRAINT post_thread
@@ -447,6 +453,7 @@ func postCreateTable() string {
     CREATE INDEX post_lower_author ON 
             Post using btree (lower(author));
 
+/*
      CREATE Table Post50 (
             CHECK(thread < 50)
         ) INHERITS (Post);
@@ -489,25 +496,24 @@ func postCreateTable() string {
 
     CREATE INDEX post100_lower_author ON 
             Post100 using btree (lower(author));
+    */
     
-    --drop function if exists trigger_post_before_function;
-    CREATE OR REPLACE FUNCTION trigger_post_before_function () 
+    /*
+    CREATE OR REPLACE FUNCTION  update_post_path() 
     RETURNS trigger AS $$ 
     DECLARE
         check_user int;
         check_parent int;
         parent_path text;
     BEGIN 
-        select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
+        --select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
         
-        if check_user = null then
-            RAISE EXCEPTION 'error with check_user';
-        END IF;
+        --if check_user = null then
+        --    RAISE EXCEPTION 'error with check_user';
+        --END IF;
 
         if NEW.parent <> 0 then
             select count(1) from Post as P where id = NEW.parent and thread = NEW.thread limit 1 into check_parent;
-
-            --select count(1) from Thread as T inner join Post as P on P.id = NEW.parent and T.id= NEW.thread and T.id=P.thread limit 1 into check_parent;
 
             if check_parent <> 1 then
                 RAISE EXCEPTION 'Parent post was created in another thread';
@@ -520,7 +526,40 @@ func postCreateTable() string {
             select path from Post where id = NEW.parent into parent_path;
         END IF;
         NEW.path = parent_path || '.' || (NEW.id::text);
-        INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
+        --INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
+        return NEW;
+    END; 
+    $$ LANGUAGE  plpgsql;
+    */
+
+    CREATE OR REPLACE FUNCTION  trigger_post_before_function() 
+    RETURNS trigger AS $$ 
+    DECLARE
+        check_user int;
+        check_parent int;
+        parent_path text;
+    BEGIN 
+        --select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
+        
+        --if check_user = null then
+        --    RAISE EXCEPTION 'error with check_user';
+        --END IF;
+
+        if NEW.parent <> 0 then
+            select count(1) from Post as P where id = NEW.parent and thread = NEW.thread limit 1 into check_parent;
+
+            if check_parent <> 1 then
+                RAISE EXCEPTION 'Parent post was created in another thread';
+            END IF;
+        END IF;
+
+        if NEW.parent = 0 then
+            parent_path = '0';
+        ELSE
+            select path from Post where id = NEW.parent into parent_path;
+        END IF;
+        NEW.path = parent_path || '.' || (NEW.id::text);
+        --INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
         return NEW;
     END; 
     $$ LANGUAGE  plpgsql;
@@ -531,7 +570,7 @@ func postCreateTable() string {
     CREATE TRIGGER post_trigger_before
     BEFORE INSERT ON Post FOR EACH ROW 
     EXECUTE PROCEDURE trigger_post_before_function ();
-
+/*
     CREATE TRIGGER post50_trigger_before
     BEFORE INSERT ON Post50 FOR EACH ROW 
     EXECUTE PROCEDURE trigger_post_before_function ();
@@ -539,6 +578,7 @@ func postCreateTable() string {
     CREATE TRIGGER post100_trigger_before
     BEFORE INSERT ON Post100 FOR EACH ROW 
     EXECUTE PROCEDURE trigger_post_before_function ();
+*/
     `
 }
 

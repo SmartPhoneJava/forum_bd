@@ -30,20 +30,23 @@ func (db *DataBase) UpdatePost(post models.Post, id int) (updatedPost models.Pos
 }
 
 // CreatePost handle post creation
-func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time) (err error) {
+func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, done chan error) {
 
 	var (
 		tx         *sql.Tx
+		tx1        *sql.Tx
 		thatThread models.Thread
 		count      int
+		err        error
 	)
 	if tx, err = db.Db.Begin(); err != nil {
+		done <- err
 		return
 	}
 	defer tx.Rollback()
 
 	if thatThread, err = db.threadFindByIDorSlug(tx, slug); err != nil {
-
+		done <- err
 		return
 	}
 
@@ -77,6 +80,7 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time) (e
 	//errchan := make(chan error)
 	count = len(posts)
 	if err = db.postsCreate(tx, posts, thatThread, t); err != nil {
+		done <- err
 		return
 	}
 	debug("posts created")
@@ -90,6 +94,18 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time) (e
 	}
 
 	err = tx.Commit()
+	done <- err // it is stop for outter functions
+
+	if tx1, err = db.Db.Begin(); err != nil {
+		//done <- err
+		return
+	}
+	defer tx1.Rollback()
+
+	db.userInForumCreatePosts(posts, thatThread)
+	//done <- nil
+
+	err = tx1.Commit()
 	/*
 			errchan := make(chan error)
 		//fmt.Println("ready to put")
