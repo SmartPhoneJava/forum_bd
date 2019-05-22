@@ -93,9 +93,10 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, do
 	}
 
 	err = tx.Commit()
-	done <- err // it is stop for outter functions
+	//done <- err // it is stop for outter functions
 
 	db.userInForumCreatePosts(posts, thatThread)
+	done <- err
 	//done <- nil
 
 	/*
@@ -139,11 +140,11 @@ func (db *DataBase) GetPosts(slug string, qgc QueryGetConditions, sort string) (
 	defer tx.Rollback()
 
 	var thatThread models.Thread
-
+	debug("GetPosts begin")
 	if thatThread, err = db.threadFindByIDorSlug(tx, slug); err != nil {
 		return
 	}
-
+	debug("GetPosts end", sort)
 	switch sort {
 	case "tree":
 		returnPosts, err = db.postsGetTree(tx, thatThread, qgc)

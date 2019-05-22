@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"strconv"
-	"time"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -29,52 +28,44 @@ func (db *DataBase) userInForumCreate(nickname, forum string) (err error) {
 
 // createThread create thread
 func (db *DataBase) threadCreate(tx *sql.Tx, thread *models.Thread) (createdThread models.Thread, err error) {
-	query := `INSERT INTO Thread(slug, author, created, forum, message, title) VALUES
-	($1, $2, $3, $4, $5, $6) 
-`
-	queryAddThreadReturning(&query)
-	row := tx.QueryRow(query, thread.Slug, thread.Author, thread.Created,
-		thread.Forum, thread.Message, thread.Title)
-
-	debug("query", query)
-	debug("pars", thread.Slug, thread.Author, thread.Created,
-		thread.Forum, thread.Message, thread.Title)
-	createdThread, err = threadScan(row)
-	/*
-		var id string
-		queryID := `select nextval('thread_id_seq');`
-		row := tx.QueryRow(queryID)
-		if err = row.Scan(&id); err != nil {
-			return
-		}
-
-		query := `INSERT INTO Thread(id, slug, author, created, forum, message, title) VALUES
-							 	($1, $2, $3, $4, $5, $6, $7)
-							 `
-		//queryAddThreadReturning(&query)
-		_, err = tx.Exec(query, id, thread.Slug, thread.Author, thread.Created,
+	var (
+		row   *sql.Row
+		query string
+	)
+	if thread.Created != "" {
+		query = `INSERT INTO Thread(slug, author, created, forum, message, title) VALUES
+		($1, $2, $3, $4, $5, $6) 
+		RETURNING id, slug, author, created, forum, message, title, votes
+	`
+		row = tx.QueryRow(query, thread.Slug, thread.Author, thread.Created,
 			thread.Forum, thread.Message, thread.Title)
 
-		debug("query", "INSERT INTO Thread(id, slug, author, forum, message, title) VALUES ("+
-			id+",'"+thread.Slug+"', '"+thread.Author+"', '", thread.Forum, "','"+
-			thread.Message+"', '"+thread.Title+"') ")
-		debug("pars", thread.Slug, thread.Author, thread.Created,
+		foundThread := models.Thread{}
+		err = row.Scan(&foundThread.ID, &foundThread.Slug,
+			&foundThread.Author, &foundThread.Created, &foundThread.Forum,
+			&foundThread.Message, &foundThread.Title, &foundThread.Votes)
+		createdThread = foundThread
+		debug("thread.Created:", thread.Created)
+	} else {
+		query = `INSERT INTO Thread(slug, author, forum, message, title) VALUES
+		($1, $2, $3, $4, $5) 
+		RETURNING id, slug, author, forum, message, title, votes
+	`
+		row = tx.QueryRow(query, thread.Slug, thread.Author,
 			thread.Forum, thread.Message, thread.Title)
-		debug("thread id:", id)
 
-		if err != nil {
-			debug("cant create cause:", err.Error())
-			return
-		}
+		foundThread := models.Thread{}
+		err = row.Scan(&foundThread.ID, &foundThread.Slug,
+			&foundThread.Author, &foundThread.Forum,
+			&foundThread.Message, &foundThread.Title, &foundThread.Votes)
+		createdThread = foundThread
+	}
 
-		queryGet := `select id, slug, author, created, forum, message, title, votes from Thread where id = ` + id
-		row = tx.QueryRow(queryGet)
-		createdThread, err = threadScan(row)
-		// if err == sql.ErrNoRows {
-		// 	err = nil
-		// 	return
-		// }
-	*/
+	//	debug("query", query)
+	//debug("pars", thread.Slug, thread.Author, thread.Created,
+	//		thread.Forum, thread.Message, thread.Title)
+	//createdThread, err = threadScan(row)
+
 	if err != nil {
 		debug("err create:", err.Error())
 	}
@@ -118,28 +109,38 @@ func (db *DataBase) threadsGetWithLimit(tx *sql.Tx, slug string, limit int) (fou
 	return
 }
 
-func (db *DataBase) threadsGet(tx *sql.Tx, slug string, limit int, lb bool, t time.Time, tb bool, desc bool) (foundThreads []models.Thread, err error) {
+func (db *DataBase) threadsGet(tx *sql.Tx, slug string, limit int, lb bool, t string, tb bool, desc bool) (foundThreads []models.Thread, err error) {
 
+	//t = t.Add(4 * time.Hour)
 	query := querySelectThread() + ` where lower(forum) like lower($1)`
 
 	if tb {
+		debug("T.created ", t)
 		if desc {
-			query += ` and created <= $2`
-			query += ` order by created desc`
+			query += ` and T.created <= $2`
+			query += ` order by T.created desc`
 		} else {
-			query += ` and created >= $2`
-			query += ` order by created`
+			query += ` and T.created >= $2`
+			query += ` order by T.created`
 		}
 		if lb {
 			query += ` Limit $3`
 		}
 	} else if lb {
+
 		if desc {
-			query += ` order by created desc`
+			query += ` order by T.created desc`
 		} else {
-			query += ` order by created`
+			query += ` order by T.created`
 		}
+
 		query += ` Limit $2`
+	} else {
+		if desc {
+			query += ` order by T.created desc`
+		} else {
+			query += ` order by T.created`
+		}
 	}
 
 	var rows *sql.Rows
@@ -165,6 +166,10 @@ func (db *DataBase) threadsGet(tx *sql.Tx, slug string, limit int, lb bool, t ti
 	for rows.Next() {
 		if err = threadsScan(rows, &foundThreads); err != nil {
 			break
+		}
+		if foundThreads[len(foundThreads)-1].ID == 9898 || foundThreads[len(foundThreads)-1].ID == 5186 {
+			debug("query", query)
+			debug("here", tb, foundThreads[len(foundThreads)-1].ID, slug, t, limit)
 		}
 	}
 	return

@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -35,6 +36,7 @@ func (db *DataBase) updateUser(tx *sql.Tx, user models.User) (updated models.Use
 	row := tx.QueryRow(query, user.Nickname)
 
 	updated, err = userScan(row)
+	fmt.Println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE SEEEEEEEEEEEEEEEEEEEEEEEEEEEEE:", user.About, "--------", updated.About)
 	return
 }
 
@@ -121,8 +123,8 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 	qc QueryGetConditions) (foundUsers []models.User, err error) {
 
 	pq := &postQuery{
-		sortASC:     ` order by lower(nickname) `,
-		sortDESC:    ` order by lower(nickname) desc `,
+		sortASC:     ` order by 2 `,
+		sortDESC:    ` order by 2 desc `,
 		compareASC:  ` and lower(nickname) > lower('` + qc.nv + `')`,
 		compareDESC: ` and lower(nickname) < lower('` + qc.nv + `')`,
 	}
@@ -139,7 +141,7 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 	// 				where lower(forum) like lower($1)
 	//	`
 
-	query := querySelectUser() + ` as uf
+	query := `SELECT distinct fullname, nickname, email, about FROM UserForum as uf
 				join (
 					select nickname as nick from UserInForum where forum like lower($1) 
 					) as uif on lower(uf.nickname)=uif.nick

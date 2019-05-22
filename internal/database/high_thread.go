@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"time"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -97,7 +96,7 @@ func (db *DataBase) UpdateThread(thread *models.Thread,
 }
 
 // GetThreads get threads
-func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t time.Time, existTime bool, desc bool) (returnThreads []models.Thread, err error) {
+func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t string, existTime bool, desc bool) (returnThreads []models.Thread, err error) {
 
 	var tx *sql.Tx
 	if tx, err = db.Db.Begin(); err != nil {
@@ -109,7 +108,6 @@ func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t time.T
 		err = re.ErrorForumNotExist()
 		return
 	}
-
 	if returnThreads, err = db.threadsGet(tx, slug, limit, existLimit, t, existTime, desc); err != nil {
 		return
 	}

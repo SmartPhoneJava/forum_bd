@@ -1,0 +1,249 @@
+{
+	"stock": "GOOGL",
+	"date": ISODate("2014-12-16"),
+	"volume": 100,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "USA", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+}
+{
+	"stock": "GOOGL",
+	"date": ISODate("2014-12-16"),
+	"volume": 100,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "GOOGL",
+	"date": ISODate("2018-12-16"),
+	"volume": 100,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "GOOGL",
+	"date": ISODate("2017-12-16"),
+	"volume": 100,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+}
+
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-01-16"),
+	"volume": 10,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-02-16"),
+	"volume": 40,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-03-16"),
+	"volume": 30,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-04-16"),
+	"volume": 10,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-04-17"),
+	"volume": 25,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-04-20"),
+	"volume": 65,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-04-20"),
+	"volume": 65,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-05-20"),
+	"volume": 65,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-05-20"),
+	"volume": 23,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-06-20"),
+	"volume": 19,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-06-19"),
+	"volume": 12,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-06-14"),
+	"volume": 10,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-06-12"),
+	"volume": 4,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-08-12"),
+	"volume": 4,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-08-13"),
+	"volume": 12,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-08-14"),
+	"volume": 17,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-09-20"),
+	"volume": 40,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-09-22"),
+	"volume": 10,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-10-26"),
+	"volume": 10,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-10-12"),
+	"volume": 7,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-10-14"),
+	"volume": 6,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-11-14"),
+	"volume": 28,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-11-15"),
+	"volume": 32,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-11-16"),
+	"volume": 48,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2014-12-16"),
+	"volume": 50,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2015-01-12"),
+	"volume": 90,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+},
+{
+	"stock": "YNDX",
+	"date": ISODate("2013-12-10"),
+	"volume": 100,
+	"quotes": [0,1,2,3,4,5,6,7,8,9,10,12,13,14,15,16,17,18,19,20,21,22,23],
+	"exchange": {"country": "France", "name": "NASDAQ"},
+	"traders": [{"name": "Don Draper", "id": 42}, {"name": "Rustin Cohle", "id": 21}]
+}

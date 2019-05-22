@@ -2,9 +2,9 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"
@@ -16,15 +16,20 @@ func (db *DataBase) voteCreate(tx *sql.Tx, vote models.Vote) (updatedVote models
 	query := `INSERT INTO Vote(author, voice, thread) VALUES
 							 ($1, $2, $3) on conflict(author, thread)  do
 							 update set voice = $2
-							 RETURNING author, voice, thread, isEdited, old_voice 
+							 RETURNING id, author, voice, thread, isEdited, old_voice 
 						 `
 	row := tx.QueryRow(query, vote.Author, vote.Voice, vote.Thread)
 
 	updatedVote = models.Vote{}
-	err = row.Scan(&updatedVote.Author, &updatedVote.Voice,
+	var id int
+	err = row.Scan(&id, &updatedVote.Author, &updatedVote.Voice,
 		&updatedVote.Thread, &updatedVote.IsEdited, &prevVoice)
+	if id == 0 {
+		err = re.ErrorVoteInvalidAuthor()
+	}
+	debug("id is", id)
 	if err != nil {
-		fmt.Println("and error:", err.Error())
+		debug("and error:", err.Error())
 	}
 	return
 }

@@ -18,7 +18,7 @@ func Init(CDB config.DatabaseConfig) (db *DataBase, err error) {
 
 	// for local launch
 	if os.Getenv(CDB.URL) == "" {
-		os.Setenv(CDB.URL, "user=rolepade password=github.com/SmartPhoneJava/forum_bd dbname=escabase sslmode=disable")
+		os.Setenv(CDB.URL, "user=rolepade password=password dbname=escabase sslmode=disable")
 	}
 
 	var database *sql.DB
@@ -37,9 +37,11 @@ func Init(CDB config.DatabaseConfig) (db *DataBase, err error) {
 		return
 	}
 	debug("database/Init open")
-	if err = db.createTables(); err != nil {
-		return
-	}
+
+	// if err = db.createTables(); err != nil {
+	// 	return
+	// }
+
 	debug("database/Init done")
 
 	return
@@ -84,12 +86,14 @@ func dropTables() string {
 
 func userCreateTable() string {
 	return `
+    CREATE EXTENSION IF NOT EXISTS CITEXT;
+    
     CREATE Table UserForum (
         id SERIAL PRIMARY KEY,
-        nickname text NOT NULL UNIQUE collate "C",
-        fullname text NOT NULL,
-        email text UNIQUE NOT NULL,
-        about text 
+        nickname CITEXT NOT NULL UNIQUE COLLATE "C",
+        fullname CITEXT NOT NULL,
+        email CITEXT UNIQUE NOT NULL,
+        about CITEXT 
     );
 
     ALTER TABLE UserForum OWNER TO rolepade;
@@ -105,8 +109,8 @@ func userInForumCreateTable() string {
     -- there are lower versions
     CREATE Table UserInForum (
         id SERIAL PRIMARY KEY,
-        nickname text NOT NULL, --nickname
-        forum text NOT NULL
+        nickname CITEXT NOT NULL,
+        forum CITEXT NOT NULL
     );
 
     ALTER TABLE UserInForum OWNER TO rolepade;
@@ -145,10 +149,10 @@ func forumCreateTable() string {
     CREATE Table Forum (
         id SERIAL PRIMARY KEY,
         posts int default 0,
-        slug text not null UNIQUE,
+        slug CITEXT not null UNIQUE,
         threads int default 0,
-        title text not null,
-        user_nickname text not null
+        title CITEXT not null,
+        user_nickname CITEXT not null
     );
 
     ALTER TABLE Forum OWNER TO rolepade;
@@ -175,14 +179,14 @@ func threadCreateTable() string {
 	return `
     CREATE Table Thread (
         id SERIAL PRIMARY KEY,
-        author text not null,
-        forum text not null,
+        author CITEXT not null,
+        forum CITEXT not null,
         forum_id int not null,
-        message text not null,
+        message CITEXT not null,
         created    TIMESTAMPTZ,
-        title text not null,
+        title CITEXT not null,
         votes int default 0,
-        slug text default null
+        slug CITEXT default null
     );
 
     ALTER TABLE Thread OWNER TO rolepade;
@@ -365,12 +369,12 @@ func threadCreateTable() string {
         CREATE OR REPLACE FUNCTION trigger_thread_before_function () 
         RETURNS trigger AS $$ 
         DECLARE
-            --fauthor text = '';
+            --fauthor CITEXT = '';
             --fcreated TIMESTAMPTZ;
-            --fmessage text;
-            --ftitle text;
+            --fmessage CITEXT;
+            --ftitle CITEXT;
             forum_id int;
-            forum_slug text;
+            forum_slug CITEXT;
         BEGIN 
         /*
             if NEW.slug <> '' then
@@ -424,14 +428,14 @@ func postCreateTable() string {
 	return `
     CREATE Table Post (
         id SERIAL PRIMARY KEY,
-        author text not null,
-        forum text,
-        message text not null,
+        author CITEXT not null,
+        forum CITEXT,
+        message CITEXT not null,
         created    TIMESTAMPTZ,
         isEdited boolean default false,
         thread int,
         parent int,
-        path text not null default '0'
+        path CITEXT not null default '0'
     );
 
     ALTER Table Post OWNER TO rolepade;
@@ -514,7 +518,7 @@ func postCreateTable() string {
     DECLARE
         check_user int;
         check_parent int;
-        parent_path text;
+        parent_path CITEXT;
     BEGIN 
         --select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
         
@@ -535,7 +539,7 @@ func postCreateTable() string {
         ELSE
             select path from Post where id = NEW.parent into parent_path;
         END IF;
-        NEW.path = parent_path || '.' || (NEW.id::text);
+        NEW.path = parent_path || '.' || (NEW.id::CITEXT);
         --INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
         return NEW;
     END; 
@@ -547,7 +551,7 @@ func postCreateTable() string {
     DECLARE
         check_user int;
         check_parent int;
-        parent_path text;
+        parent_path CITEXT;
     BEGIN 
         check_user := 0;
         select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
@@ -569,7 +573,7 @@ func postCreateTable() string {
         ELSE
             select path from Post where id = NEW.parent into parent_path;
         END IF;
-        NEW.path = parent_path || '.' || (NEW.id::text);
+        NEW.path = parent_path || '.' || (NEW.id::CITEXT);
         --INSERT into UserInForum(nickname, forum) values (lower(NEW.author), lower(NEW.forum));
         return NEW;
     END; 
@@ -597,7 +601,7 @@ func voteCreateTable() string {
 	return `
     CREATE Table Vote (
         id SERIAL PRIMARY KEY,
-        author text not null,
+        author CITEXT not null,
         thread int not null,
         isEdited bool default false,
         voice int default 0,
@@ -606,11 +610,11 @@ func voteCreateTable() string {
 
     ALTER Table Vote OWNER TO rolepade;
 
-    --ALTER TABLE Vote
-    --ADD CONSTRAINT vote_user
-    --FOREIGN KEY (author)
-    --REFERENCES UserForum(nickname)
-    --   ON DELETE CASCADE;
+    ALTER TABLE Vote
+    ADD CONSTRAINT vote_user
+    FOREIGN KEY (author)
+    REFERENCES UserForum(nickname)
+       ON DELETE CASCADE;
 
     --CREATE INDEX vote_thread ON 
     --    Vote using btree (thread);
@@ -631,15 +635,17 @@ func voteCreateTable() string {
     DECLARE
     check_user int;
     BEGIN 
-
+        /*
     check_user := 0;
-        select 1 from UserForum where lower(nickname) like lower(NEW.author) limit 1 into check_user; 
-        
-        if check_user = 0 then
-            RAISE EXCEPTION 'error with check_user';
-        END IF;
+    select count(1) from UserInForum where nickname like NEW.author limit 1 into check_user; 
+    
+    if check_user <> 1 then
+        RAISE EXCEPTION 'error with check_user';
+    END IF;*/
 
-    NEW.old_voice = OLD.voice; 
+    if  TG_OP = 'UPDATE' then
+        NEW.old_voice = OLD.voice; 
+    end if;
     
     return NEW;
     END; 

@@ -2,7 +2,6 @@ package api
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -132,7 +131,7 @@ func (h *Handler) GetThreads(rw http.ResponseWriter, r *http.Request) {
 		threads    []models.Thread
 		slug       string
 		limit      int
-		t          time.Time
+		t          string
 		err        error
 		existLimit bool
 		existTime  bool

@@ -2,6 +2,8 @@ package database
 
 import (
 	"database/sql"
+	"fmt"
+
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
@@ -49,6 +51,8 @@ func (db *DataBase) GetUsers(slug string, qgc QueryGetConditions) (returnUsers [
 	if returnUsers, err = db.usersGet(tx, slug, qgc); err != nil {
 		return
 	}
+
+	fmt.Println("!!!!getusers:", len(returnUsers))
 
 	err = tx.Commit()
 	return
