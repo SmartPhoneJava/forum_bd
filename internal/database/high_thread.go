@@ -2,24 +2,35 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
-	"time"
+	"fmt"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"
 )
 
 // CreateThread handle thread creation
-func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thread, err error) {
+func (db *DataBase) CreateThread(thread *models.Thread,
+	modelChan chan *models.Thread, errChan chan error) {
 
-	var tx *sql.Tx
+	var (
+		tx           *sql.Tx
+		err          error
+		returnThread models.Thread
+	)
 	if tx, err = db.Db.Begin(); err != nil {
+		errChan <- err
+		modelChan <- nil
 		return
 	}
 	defer tx.Rollback()
 
 	if returnThread, err = db.threadConfirmUnique(tx, thread); err != nil {
+		//err = re.ErrorThreadConflict()
+		errChan <- re.ErrorThreadConflict()
+		modelChan <- &returnThread
 		return
 	}
 
@@ -27,23 +38,39 @@ func (db *DataBase) CreateThread(thread *models.Thread) (returnThread models.Thr
 	// 	return
 	// }
 
-	if thread.Forum, err = db.forumCheckID(tx, thread.Forum); err != nil {
-		return
-	}
-
+	// debug("forumCheckID:", thread.Forum)
+	// if thread.Forum, err = db.forumCheckID(tx, thread.Forum); err != nil {
+	// 	return
+	// }
+	debug("forumCheckID1:", thread.Forum)
 	if returnThread, err = db.threadCreate(tx, thread); err != nil {
+		modelChan <- nil
+		errChan <- err
 		return
 	}
 
-	if err = db.forumUpdateThreads(tx, thread.Forum); err != nil {
+	// if err = db.forumUpdateThreads(tx, thread.Forum); err != nil {
+	// 	return
+	// }
+
+	// if err = db.statusAddThread(tx, 1); err != nil {
+	// 	return
+	// }
+
+	if err = tx.Commit(); err != nil {
+		fmt.Println("err:", err.Error())
+		modelChan <- nil
+		errChan <- err
+		return
+	}
+	modelChan <- &returnThread
+	errChan <- nil
+
+	if erro := db.userInForumCreate(thread.Author, thread.Forum); erro != nil {
+		debug("erro:", erro.Error())
 		return
 	}
 
-	if err = db.statusAddThread(tx, 1); err != nil {
-		return
-	}
-
-	err = tx.Commit()
 	return
 }
 
@@ -69,7 +96,7 @@ func (db *DataBase) UpdateThread(thread *models.Thread,
 }
 
 // GetThreads get threads
-func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t time.Time, existTime bool, desc bool) (returnThreads []models.Thread, err error) {
+func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t string, existTime bool, desc bool) (returnThreads []models.Thread, err error) {
 
 	var tx *sql.Tx
 	if tx, err = db.Db.Begin(); err != nil {
@@ -81,7 +108,6 @@ func (db *DataBase) GetThreads(slug string, limit int, existLimit bool, t time.T
 		err = re.ErrorForumNotExist()
 		return
 	}
-
 	if returnThreads, err = db.threadsGet(tx, slug, limit, existLimit, t, existTime, desc); err != nil {
 		return
 	}

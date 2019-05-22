@@ -1,7 +1,7 @@
 package api
 
 import (
-	"forum_bd/internal/models"
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	"net/http"
 )
 

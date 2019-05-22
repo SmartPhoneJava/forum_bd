@@ -2,13 +2,14 @@ package api
 
 import (
 	"encoding/json"
-	"forum_bd/internal/models"
 	"fmt"
 	"net/http"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 )
 
 func printResult(catched error, number int, place string) {
-
+	//return
 	if catched != nil {
 		fmt.Println("api/"+place+" failed(code:", number, "). Error message:"+catched.Error())
 	} else {
@@ -35,10 +36,11 @@ func sendSuccessJSON(rw http.ResponseWriter, result interface{}, place string) {
 		}
 	}
 
-	//bytes, _ := json.Marshal(result)
+	bytes, _ := json.Marshal(result)
 	//fmt.Println("result2:" + string(bytes))
-	//rw.Write(bytes)
-	json.NewEncoder(rw).Encode(result)
+	rw.Write(bytes)
+
+	//json.NewEncoder(rw).Encode(result)
 }
 
 // func sendPublicUser(h *Handler, rw http.ResponseWriter, username string, place string) error {

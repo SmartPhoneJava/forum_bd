@@ -2,9 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"fmt"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"
@@ -35,6 +36,7 @@ func (db *DataBase) updateUser(tx *sql.Tx, user models.User) (updated models.Use
 	row := tx.QueryRow(query, user.Nickname)
 
 	updated, err = userScan(row)
+	fmt.Println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE SEEEEEEEEEEEEEEEEEEEEEEEEEEEEE:", user.About, "--------", updated.About)
 	return
 }
 
@@ -48,6 +50,17 @@ func (db *DataBase) userCheckID(tx *sql.Tx, oldNickname string) (newNickname str
 	newNickname = thatUser.Nickname
 	return
 }
+
+// func (db *DataBase) userCheckNames(tx *sql.Tx, names []string) (err error) {
+// 	var thatUser models.User
+// 	query := ` SELECT 1 FROM UserForum where all `
+// 	if thatUser, err = db.findUserByName(tx, oldNickname); err != nil {
+// 		err = re.ErrorUserNotExist()
+// 		return
+// 	}
+// 	newNickname = thatUser.Nickname
+// 	return
+// }
 
 // confirmUnique confirm that user.Email and user.Name
 // dont use by another Player
@@ -110,41 +123,86 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 	qc QueryGetConditions) (foundUsers []models.User, err error) {
 
 	pq := &postQuery{
-		sortASC:     ` order by lower(nickname) `,
-		sortDESC:    ` order by lower(nickname) desc `,
+		sortASC:     ` order by 2 `,
+		sortDESC:    ` order by 2 desc `,
 		compareASC:  ` and lower(nickname) > lower('` + qc.nv + `')`,
 		compareDESC: ` and lower(nickname) < lower('` + qc.nv + `')`,
 	}
 
-	query := querySelectUser() + ` as uf 
-		where (
-			nickname in 
-		(
-			select author
-				from Post
-				where 
-				lower(uf.nickname) like lower(author) and
-				lower(forum) like lower($1)
-		) or
-		nickname in 
-		(
-			select author
-				from Thread
-				where 
-				lower(uf.nickname) like lower(author) and
-				lower(forum) like lower($1)
-		)
-		)
-	`
+	// queryFromPost := querySelectUser() + ` as uf
+	// 			join Post as P on
+	// 					lower(uf.nickname) = lower(P.author)
+	// 					where lower(forum) like lower($1)
+	// 		`
+
+	// queryFromThread := querySelectUser() + ` as uf
+	// 		join Post as P on
+	// 				lower(uf.nickname) = lower(P.author)
+	// 				where lower(forum) like lower($1)
+	//	`
+
+	query := `SELECT distinct fullname, nickname, email, about FROM UserForum as uf
+				join (
+					select nickname as nick from UserInForum where forum like lower($1) 
+					) as uif on lower(uf.nickname)=uif.nick
+			`
+
+	/*
+		query := querySelectUser() + ` as uf
+					where (
+						nickname in
+					(
+						select author
+							from Post
+							where
+							lower(uf.nickname) like lower(author) and
+							lower(forum) like lower($1)
+					) or
+					nickname in
+					(
+						select author
+							from Thread
+							where
+							lower(uf.nickname) like lower(author) and
+							lower(forum) like lower($1)
+					)
+					)
+				`
+	*/
+	/*
+		query := "select distinct * from (" + querySelectUser() + ` uf
+			join
+			(
+				select author as name
+					from Post
+					where
+					--lower(uf.nickname) like lower(author) and
+					lower(forum) like lower($1)
+			) as P on lower(uf.nickname) like lower(P.name)
+			join
+			(
+				select author as name
+					from Thread
+					where
+					--lower(uf.nickname) like lower(author) and
+					lower(forum) like lower($1)
+			) as T on lower(uf.nickname) like lower(T.name)
+		`
+	*/
 	queryAddConditions(&query, qc, pq)
 
-	fmt.Println("query:" + query)
+	//query += ") as Al"
+
+	debug("query:" + query)
+	debug("$1:", slug)
 	var rows *sql.Rows
 
 	if rows, err = tx.Query(query, slug); err != nil {
+		debug("get users err", err.Error())
 		return
 	}
 	defer rows.Close()
+	debug("query get rows")
 
 	foundUsers = []models.User{}
 	for rows.Next() {
@@ -152,6 +210,7 @@ func (db *DataBase) usersGet(tx *sql.Tx, slug string,
 			break
 		}
 	}
+	debug("get users done")
 	return
 }
 

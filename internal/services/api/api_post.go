@@ -1,14 +1,18 @@
 package api
 
 import (
-	data "forum_bd/internal/database"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"net/http"
+	"time"
+
+	data "github.com/SmartPhoneJava/forum_bd/internal/database"
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 )
 
 // CreatePosts create posts
 func (h *Handler) CreatePosts(rw http.ResponseWriter, r *http.Request) {
+	t := time.Now().Round(time.Millisecond)
+	//fmt.Println("time is", t)
 	const place = "CreatePosts"
 	var (
 		posts []models.Post
@@ -32,7 +36,10 @@ func (h *Handler) CreatePosts(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if posts, err = h.DB.CreatePost(posts, slug); err != nil {
+	errChan := make(chan error, 1)
+	go h.DB.CreatePost(posts, slug, t, errChan)
+
+	if err = <-errChan; err != nil {
 		if err.Error() != re.ErrorPostConflict().Error() {
 			rw.WriteHeader(http.StatusNotFound)
 			sendErrorJSON(rw, err, place)
@@ -101,7 +108,6 @@ func (h *Handler) GetPosts(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, posts, place)
 	printResult(err, http.StatusOK, place)
 	return
@@ -144,8 +150,6 @@ func (h *Handler) UpdatePost(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post.Print()
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, post, place)
 	printResult(err, http.StatusOK, place)
 	return

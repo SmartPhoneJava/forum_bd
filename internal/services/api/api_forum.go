@@ -1,9 +1,10 @@
 package api
 
 import (
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"net/http"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 )
 
 // CreateForum create forum
@@ -66,7 +67,6 @@ func (h *Handler) GetForum(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rw.WriteHeader(http.StatusOK)
 	sendSuccessJSON(rw, forum, place)
 	printResult(err, http.StatusOK, place)
 	return

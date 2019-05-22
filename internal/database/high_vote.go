@@ -2,7 +2,8 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
 	//
 	_ "github.com/lib/pq"
@@ -13,7 +14,7 @@ func (db *DataBase) CreateVote(vote models.Vote, slug string) (thread models.Thr
 
 	var (
 		tx        *sql.Tx
-		prevVote  models.Vote
+		threadID  int
 		prevVoice int
 	)
 	if tx, err = db.Db.Begin(); err != nil {
@@ -24,30 +25,48 @@ func (db *DataBase) CreateVote(vote models.Vote, slug string) (thread models.Thr
 	if thread, err = db.threadFindByIDorSlug(tx, slug); err != nil {
 		return
 	}
+	threadID = thread.ID
 
-	if prevVote, err = db.voteFindByThreadAndAuthor(tx, thread.ID, vote.Author); err != nil && err != sql.ErrNoRows {
-		return
-	}
+	//if threadID, err = db.threadIDBySlug(tx, slug); err != nil {
+	//if thread, err = db.threadFindByIDorSlug(tx, slug); err != nil {
+	//return
+	//}
+	//threadID = thread.ID
+	//}
+	var prevVote models.Vote
 
-	//vote.Print()
-
-	if err != nil {
-		prevVoice = 0
-		if vote, err = db.voteCreate(tx, vote, thread); err != nil {
+	/*
+		if prevVote, err = db.voteFindByThreadAndAuthor(tx, threadID, vote.Author); err != nil && err != sql.ErrNoRows {
 			return
 		}
-	} else {
-		prevVoice = prevVote.Voice
-		if vote, err = db.voteUpdate(tx, vote, thread); err != nil {
-			err = nil
-			return
-		}
-	}
+		if err != nil {
+			if vote, err = db.voteCreate(tx, vote, threadID); err != nil {
+				return
+			}
+		} else {
 
-	newVoice := vote.Voice - prevVoice
-	if thread, err = db.voteThread(tx, newVoice, thread); err != nil {
+			if vote, prevVoice, err = db.voteUpdate(tx, vote, threadID); err != nil {
+				return
+			}
+		}
+	*/
+	vote.Thread = threadID
+
+	if vote, prevVoice, err = db.voteCreate(tx, vote); err != nil {
+		debug("errrr:", err.Error())
 		return
 	}
 	err = tx.Commit()
+	if err != nil {
+		return
+	}
+
+	newVoice := vote.Voice - prevVoice
+	thread.Votes += newVoice
+	debug("#"+vote.Author, "newVoice!", thread.Votes, newVoice, vote.Voice, prevVoice, prevVote.Voice)
+	// if thread, err = db.voteThread(tx, newVoice, threadID); err != nil {
+	// 	return
+	// }
+
 	return
 }

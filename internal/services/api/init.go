@@ -1,8 +1,8 @@
 package api
 
 import (
-	"forum_bd/internal/config"
-	"forum_bd/internal/database"
+	"github.com/SmartPhoneJava/forum_bd/internal/config"
+	"github.com/SmartPhoneJava/forum_bd/internal/database"
 	//"reflect"
 )
 

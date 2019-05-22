@@ -6,7 +6,7 @@
 	"dataBase": {
 		"driverName": "postgres",
 		"url": "DATABASE_URL",
-		"maxOpenConns": 10,
+		"maxOpenConns": 100,
 		"tables": [
 			"Player",
 			"Session",

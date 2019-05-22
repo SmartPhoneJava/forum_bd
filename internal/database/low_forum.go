@@ -2,9 +2,10 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"strconv"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	//
 	_ "github.com/lib/pq"

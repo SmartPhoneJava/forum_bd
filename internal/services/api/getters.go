@@ -2,11 +2,11 @@ package api
 
 import (
 	"encoding/json"
-	"forum_bd/internal/models"
-	re "forum_bd/internal/return_errors"
 	"net/http"
 	"strconv"
-	"time"
+
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
+	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
 
 	"github.com/gorilla/mux"
 )
@@ -131,35 +131,35 @@ func getIDmin(r *http.Request) (exist bool, since int, err error) {
 	return
 }
 
-func getTime(r *http.Request) (exist bool, t time.Time, err error) {
+func getTime(r *http.Request) (exist bool, t string, err error) {
 
 	exist = true
-	str := r.FormValue("since")
-	if str == "" {
+	t = r.FormValue("since")
+	if t == "" {
 		exist = false
 		return
 	}
 
-	var num int
+	/*
+		if t, err = time.Parse("2006-01-02T15:04:05.000+03:00", str); err != nil {
+			if t, err = time.Parse("2006-01-02T15:04:05.000Z", str); err != nil {
+				if num, err = strconv.Atoi(str); err != nil {
+					return
+				}
+				if num < 0 {
+					err = re.ErrorInvalidDate()
+					return
+				} else if num < 10000 {
+					t = time.Date(num, 0, 0, 0, 0, 0, 0, time.UTC)
+				} else {
+					err = re.ErrorInvalidDate()
+					return
+				}
 
-	if t, err = time.Parse("2006-01-02T15:04:05.000+03:00", str); err != nil {
-		if t, err = time.Parse("2006-01-02T15:04:05.000Z", str); err != nil {
-			if num, err = strconv.Atoi(str); err != nil {
-				return
-			}
-			if num < 0 {
-				err = re.ErrorInvalidDate()
-				return
-			} else if num < 10000 {
-				t = time.Date(num, 0, 0, 0, 0, 0, 0, time.UTC)
-			} else {
-				err = re.ErrorInvalidDate()
-				return
 			}
 
 		}
-
-	}
+	*/
 
 	return
 }

@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"time"
 
 	//
 	_ "github.com/lib/pq"
@@ -23,15 +22,15 @@ type QueryParameters struct {
 
 // QueryGetConditions query
 type QueryGetConditions struct {
-	tv   time.Time // time value
-	tn   bool      // time need
-	mv   int       // min id value
-	mn   bool      // min id need
-	nv   string    // nickname value
-	nn   bool      // nickname need
-	lv   int       // limit value
-	ln   bool      // limit need
-	desc bool      // desc need
+	tv   string // time value
+	tn   bool   // time need
+	mv   int    // min id value
+	mn   bool   // min id need
+	nv   string // nickname value
+	nn   bool   // nickname need
+	lv   int    // limit value
+	ln   bool   // limit need
+	desc bool   // desc need
 }
 
 // InitUser init user
@@ -55,11 +54,15 @@ func (qgc *QueryGetConditions) InitPost(
 }
 
 // InitThread init thread
-func (qgc *QueryGetConditions) InitThread(tv time.Time,
+func (qgc *QueryGetConditions) InitThread(tv string,
 	tn bool, lv int, ln bool, desc bool) {
 	qgc.tv = tv
 	qgc.tn = tn
 	qgc.lv = lv
 	qgc.ln = ln
 	qgc.desc = desc
+}
+
+func debug(text ...interface{}) {
+	//fmt.Println(text...)
 }

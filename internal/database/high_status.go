@@ -2,7 +2,7 @@ package database
 
 import (
 	"database/sql"
-	"forum_bd/internal/models"
+	"github.com/SmartPhoneJava/forum_bd/internal/models"
 
 	//
 	_ "github.com/lib/pq"
