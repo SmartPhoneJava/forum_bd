@@ -49,34 +49,6 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, do
 		return
 	}
 
-	// size := len(posts)
-	// users := make([]string, size)
-
-	/*
-		for _, post := range posts {
-
-			// if _, err = db.userCheckID(tx, post.Author); err != nil {
-			// 	return
-			// }
-			fmt.Println("post.Author:", post.Author)
-
-			if post, err = db.postCreate(tx, post, thatThread, t); err != nil {
-				return
-			}
-
-			// if post.Parent != 0 {
-			// 	if err = db.postCheckParent(tx, post, thatThread); err != nil {
-			// 		fmt.Println("re.ErrorPostConflict()", thatThread.ID, post.Thread, post.Thread, post.ID)
-			// 		//err = re.ErrorPostConflict()
-			// 		return
-			// 	}
-			// }
-
-			createdPosts = append(createdPosts, post)
-			count++
-		}
-	*/
-	//errchan := make(chan error)
 	count = len(posts)
 	if err = db.postsCreate(tx, posts, thatThread, t); err != nil {
 		done <- err
@@ -93,40 +65,11 @@ func (db *DataBase) CreatePost(posts []models.Post, slug string, t time.Time, do
 	}
 
 	err = tx.Commit()
-	//done <- err // it is stop for outter functions
+	done <- err // it is stop for outter functions
 
 	db.userInForumCreatePosts(posts, thatThread)
-	done <- err
+	//done <- err
 	//done <- nil
-
-	/*
-			errchan := make(chan error)
-		//fmt.Println("ready to put")
-		errchan <- err
-		//fmt.Println("we put")
-		defer close(errchan)
-
-		count := len(posts)
-		//fmt.Println("init")
-		all := &sync.WaitGroup{}
-		all.Add(3)
-		go db.postsCreate(tx1, posts, thatThread, t, all, errchan)
-		go db.forumUpdatePosts(tx2, thatThread.Forum, count, all, errchan)
-		go db.statusAddPost(tx3, count, all, errchan)
-
-		//fmt.Println("wait start:")
-		all.Wait()
-		//fmt.Println("wait over:")
-		var ok bool
-		if err, ok = <-errchan; ok && (err != nil) {
-			//fmt.Println("err:", err.Error())
-			return
-		}
-
-		err = tx1.Commit()
-		err = tx2.Commit()
-		err = tx3.Commit()
-	*/
 	return
 }
 

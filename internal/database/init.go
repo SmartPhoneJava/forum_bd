@@ -38,9 +38,9 @@ func Init(CDB config.DatabaseConfig) (db *DataBase, err error) {
 	}
 	debug("database/Init open")
 
-	// if err = db.createTables(); err != nil {
-	// 	return
-	// }
+	if err = db.createTables(); err != nil {
+		return
+	}
 
 	debug("database/Init done")
 

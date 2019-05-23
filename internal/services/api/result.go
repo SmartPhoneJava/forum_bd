@@ -9,7 +9,7 @@ import (
 )
 
 func printResult(catched error, number int, place string) {
-	//return
+	return
 	if catched != nil {
 		fmt.Println("api/"+place+" failed(code:", number, "). Error message:"+catched.Error())
 	} else {
