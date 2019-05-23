@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -36,7 +35,6 @@ func (db *DataBase) updateUser(tx *sql.Tx, user models.User) (updated models.Use
 	row := tx.QueryRow(query, user.Nickname)
 
 	updated, err = userScan(row)
-	fmt.Println("WEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE SEEEEEEEEEEEEEEEEEEEEEEEEEEEEE:", user.About, "--------", updated.About)
 	return
 }
 

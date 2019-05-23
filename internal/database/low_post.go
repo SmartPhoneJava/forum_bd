@@ -153,7 +153,7 @@ func (db *DataBase) postsCreate(tx *sql.Tx, posts []models.Post, thread models.T
 		}
 		i++
 	}
-	fmt.Println("size:", i)
+	debug("size:", i)
 
 	if err != nil {
 		debug(err.Error())

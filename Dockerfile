@@ -46,4 +46,4 @@ EXPOSE 5432
 
 USER root
 
-CMD service postgresql start && go run main.go && ./tech-db-forum fill && ./tech-db-forum perf
+CMD service postgresql start && go run main.go

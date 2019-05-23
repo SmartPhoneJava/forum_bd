@@ -2,7 +2,6 @@ package database
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/SmartPhoneJava/forum_bd/internal/models"
 	re "github.com/SmartPhoneJava/forum_bd/internal/return_errors"
@@ -49,16 +48,8 @@ func (db *DataBase) CreateThread(thread *models.Thread,
 		return
 	}
 
-	// if err = db.forumUpdateThreads(tx, thread.Forum); err != nil {
-	// 	return
-	// }
-
-	// if err = db.statusAddThread(tx, 1); err != nil {
-	// 	return
-	// }
-
 	if err = tx.Commit(); err != nil {
-		fmt.Println("err:", err.Error())
+		debug("err:", err.Error())
 		modelChan <- nil
 		errChan <- err
 		return
